@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://img.icons8.com/color/512/apple-calculator.png" type="image/x-icon">
+    <title>iOS Calculator</title>
+    <link rel="stylesheet" href="style.css"></link>
+
+     <style>
+        * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #6e6e7c49;  /* #1c1c1e */
+    /*background:linear gradient(135deg, #4c4b4c, #04010a);*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.calculator {
+    background-color: #000000;
+    width: 360px;
+    padding: 20px;
+    border-radius: 40px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+}
+calculator-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 200px;
+    margin: left 400px;
+    text-align: center;
+}
+ calculator-title{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    color:#333333;
+    margin:0;
+    margin-left: 200px;
+ }
+
+.display {
+    color: #ffffff;
+    font-size: 70px;
+    font-weight: 300;
+    text-align: right;
+    padding: 20px 10px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.btn {
+    background-color: #2c2c2e;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    aspect-ratio: 1; /* Makes buttons perfectly circular */
+    font-size: 28px;
+    font-weight: 400;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: filter 0.1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.08s ease, filter 0.12s ease,box-shadow 0.08s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.btn:active {
+    filter: brightness(1.25);
+    transform: scale(0.90);
+    filter: brightness(1.2);
+    box-shadow:0 2px 5px rgba(0,0,0,0.3); inset: 0 2px 5px rgba(0,0,0,0.3);
+}
+.btn:hover {
+    filter: brightness(1.1);    
+}
+.ripple {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: rippleAnim 0.4s linear;
+}
+
+@keyframes rippleAnim {
+    to {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0;
+    }
+}
+/* Light Gray Top Buttons */
+.gray-btn {
+    background-color: #48484a;
+}
+
+/* Orange Operator Buttons */
+.orange-btn {
+    background-color: #ff9f0a;
+    box-shadow: 0px 0px 10px rgba(255, 159, 10, 0.6);
+}
+.history-panel {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 220px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #1c1c1e;
+    color: white;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.history-panel h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #aaa;
+}
+
+.history-panel ul {
+    list-style: none;
+}
+
+.history-panel li {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.history-panel li:hover {
+    background: #2c2c2e;
+}
+    </style>
+</head>
+<body>
+   <div class="calclator-wrapper" style="text-align: center;">
+    <h1 class="calculator-title">iOS Calculator</h1>
+     <br>
+   <div class="calculator">
+       
+        <div id="display" class="display">0</div>
+        
+        
+        <div class="buttons">
+            
+            
+            <button class="btn gray-btn">⌫</button>
+            <button class="btn gray-btn">AC</button>
+            <button class="btn gray-btn">%</button>
+            <button class="btn orange-btn" data-operator>÷</button>
+            
+        
+            <button class="btn" >7</button>
+            <button class="btn" >8</button>
+            <button class="btn" >9</button>
+            <button class="btn orange-btn" data-operator>&times;</button>
+        
+            <button class="btn" >4</button>
+            <button class="btn" >5</button>
+            <button class="btn" >6</button>
+            <button class="btn orange-btn" data-operator>-</button>
+            
+    
+            <button class="btn">1</button>
+            <button class="btn">2</button>
+            <button class="btn">3</button>
+            <button class="btn orange-btn" data-operator>+</button>
+            
+            <button class="btn">±</button>
+            <button class="btn">0</button>
+            <button class="btn">.</button>
+            <button class="btn orange-btn">=</button>
+        </div>
+    </div></div>
+    <div class="history-panel">
+    <h3>History</h3>
+    <ul id="historyList"></ul>
+    <button onclick="clearHistory()" style="margin-top:10px;">Clear</button>
+</div>
+
+    <script src="script.js"></script>
+    <script>
+        const title = document.querySelector('.calculator-title');
+        title.textContent = 'iOS Calculator';
+        // 1. Select the necessary DOM elements
+const display = document.getElementById('display');
+const buttons = document.querySelectorAll('button');
+
+// 2. Track the state of the calculator
+let currentInput = '0';
+let previousInput = '';
+let operator = null;
+let shouldResetDisplay = false;
+
+// 3. Main event listener for button clicks
+
+buttons.forEach(button => {
+   /* button.addEventListener('click', () => {
+        const action = button.dataset.action; // e.g., 'clear', 'calculate', 'backspace'
+        const value = button.innerText;
+
+        // If it's a number or decimal
+        if (!action && (!isNaN(value) || value === '.')) {
+            handleNumber(value);
+        } 
+        // If it's an operator (+, -, *, /)
+        else if (button.hasAttribute('data-operator')) {
+            handleOperator(value);
+        } 
+        // If it's a special functional key
+        else {
+            handleAction(action, value);
+        }
+        
+        updateDisplay();
+    });
+});*/
+
+    button.addEventListener('click', function (e) {
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+
+        const rect = button.getBoundingClientRect();
+        ripple.style.left = `${e.clientX - rect.left}px`;
+        ripple.style.top = `${e.clientY - rect.top}px`;
+
+        button.appendChild(ripple);
+
+        setTimeout(() => ripple.remove(), 400);
+    });
+});
+const historyList = document.getElementById('historyList');
+let history = [];
+// 4. Logic for handling number inputs
+function handleNumber(num) {
+    if (currentInput === '0' && num !== '.') {
+        currentInput = num;
+    } else if (shouldResetDisplay) {
+        currentInput = num;
+        shouldResetDisplay = false;
+    } else {
+        // Prevent multiple decimals
+        if (num === '.' && currentInput.includes('.')) return;
+        currentInput += num;
+    }
+}
+
+// 5. Logic for handling operators
+function handleOperator(nextOperator) {
+    const parsedCurrent = parseFloat(currentInput);
+
+     document.querySelectorAll('.orange-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // highlight clicked operator
+    // event.target.classList.add('active');
+    function handleOperator(nextOperator) {
+    const parsedCurrent = parseFloat(currentInput);
+
+    highlightOperator(nextOperator); // ✅ use this instead
+
+    if (operator && shouldResetDisplay) {
+        operator = nextOperator;
+        return;
+    }
+
+    if (previousInput === '') {
+        previousInput = currentInput;
+    } else if (operator) {
+        const result = calculate(parseFloat(previousInput), parsedCurrent, operator);
+        currentInput = String(result);
+        previousInput = String(result);
+    }
+
+    shouldResetDisplay = true;
+    operator = nextOperator;
+}
+
+    if (operator && shouldResetDisplay) {
+        operator = nextOperator;
+        return;
+    }
+
+    if (previousInput === '') {
+        previousInput = currentInput;
+    } else if (operator) {
+        const result = calculate(parseFloat(previousInput), parsedCurrent, operator);
+        currentInput = String(result);
+        previousInput = String(result);
+    }
+
+    shouldResetDisplay = true;
+    operator = nextOperator;
+}
+
+// 6. Core calculation logic
+function calculate(first, second, op) {
+    if (op === '+') return first + second;
+    if (op === '-') return first - second;
+    if (op === '×' || op === '*') return first * second;
+    if (op === '÷' || op === '/') return first / second;
+    return second;
+}
+
+// 7. Logic for functional buttons (AC, backspace, %, ±)
+function handleAction(action, value) {
+    if (value === 'AC') {
+        currentInput = '0';
+        previousInput = '';
+        operator = null;
+        shouldResetDisplay = false;
+    } else if (action === 'backspace' || value === '⌫') {
+        if (currentInput.length > 1) {
+            currentInput = currentInput.slice(0, -1);
+        } else {
+            currentInput = '0';
+        }
+    } else if (value === '±') {
+        currentInput = String(parseFloat(currentInput) * -1);
+    } else if (value === '%') {
+        currentInput = String(parseFloat(currentInput) / 100);
+    } /*else if (value === '=') {
+        if (!operator || previousInput === '') return;
+        const result = calculate(parseFloat(previousInput), parseFloat(currentInput), operator);
+        currentInput = String(result);
+        previousInput = '';
+        operator = null;
+        shouldResetDisplay = true;
+    }*/
+   else if (value === '=') {
+    if (!operator || previousInput === '') return;
+
+    const expression = `${previousInput} ${operator} ${currentInput}`;
+
+    const result = calculate(
+        parseFloat(previousInput),
+        parseFloat(currentInput),
+        operator
+    );
+
+    currentInput = String(result);
+
+    // ✅ add to history
+    addToHistory(expression, result);
+
+    previousInput = '';
+    operator = null;
+    shouldResetDisplay = true;
+} 
+    document.querySelectorAll('.orange-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+}
+
+// 8. Update the user interface
+function updateDisplay() {
+    // Prevent display overflow for long numbers
+    if (currentInput.length > 9) {
+        display.innerText = parseFloat(currentInput).toPrecision(7);
+    } else {
+        display.innerText = currentInput;
+    }
+}
+function updateDisplay() {
+    let num = parseFloat(currentInput);
+
+    if (isNaN(num)) {
+        display.innerText = currentInput;
+        return;
+    }
+
+    // Limit size like iPhone
+    if (Math.abs(num) > 999999999) {
+        display.innerText = num.toExponential(5);
+    } else {
+        display.innerText = num.toLocaleString('en-US', {
+            maximumFractionDigits: 6
+        });
+    }
+}
+  function highlightOperator(op) {
+    document.querySelectorAll('.orange-btn').forEach(btn => {
+        btn.classList.remove('active');
+
+        if (btn.innerText === op) {
+            btn.classList.add('active');
+        }
+    });
+} 
+document.addEventListener('keydown', (e) => {
+    const key = e.key;
+
+    // 🔢 Numbers
+    if (!isNaN(key)) {
+        handleNumber(key);
+        updateDisplay();
+        return;
+    }
+
+    // 🔘 Decimal
+    if (key === '.') {
+        handleNumber('.');
+        updateDisplay();
+        return;
+    }
+
+    // ➕ Operators
+    if (key === '+' || key === '-' || key === '*' || key === '/') {
+        let op = key;
+
+        // Convert keyboard symbols to your UI symbols
+        if (key === '*') op = '×';
+        if (key === '/') op = '÷';
+
+        handleOperator(op);
+        updateDisplay();
+        highlightOperator(op);
+        return;
+    }
+
+    // ⏎ Enter or =
+    if (key === 'Enter' || key === '=') {
+        handleAction(null, '=');
+        updateDisplay();
+        return;
+    }
+
+    // ⌫ Backspace
+    if (key === 'Backspace') {
+        handleAction('backspace', '⌫');
+        updateDisplay();
+        return;
+    }
+
+    // ⎋ Escape → AC
+    if (key === 'Escape') {
+        handleAction(null, 'AC');
+        updateDisplay();
+        return;
+    }
+
+    // % Percent
+    if (key === '%') {
+        handleAction(null, '%');
+        updateDisplay();
+        return;
+    }
+});
+function addToHistory(expression, result) {
+    const entry = `${expression} = ${result}`;
+    history.unshift(entry); // newest on top
+
+    if (history.length > 10) {
+        history.pop(); // limit history
+    }
+
+    renderHistory();
+}
+
+function renderHistory() {
+    historyList.innerHTML = '';
+
+    history.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+
+        // click to reuse result
+        li.addEventListener('click', () => {
+            const value = item.split('=')[1].trim();
+            currentInput = value;
+            updateDisplay();
+        });
+
+        historyList.appendChild(li);
+    });
+}
+function clearHistory() {
+    history = [];
+    renderHistory();
+}
+    </script>
+</body>
+</html>
